@@ -5,9 +5,9 @@ import PageLoading from '../component/PageLoading'
 
 import header from '../images/platziconf-logo.svg';
 import api from '../api.js'
-import './styles/badgeNew.css'
+import './styles/badgeEdit.css'
 
-class BadgeNew extends React.Component {
+class BadgeEdit extends React.Component {
   state = {
     loading: false, error: null,
     form: {
@@ -18,6 +18,23 @@ class BadgeNew extends React.Component {
     twitter:'',
   }}
 
+  componentDidMount() {
+    this.fetchData();
+  }
+
+  async fetchData() {
+    this.setState({loading: true, error: null})
+    try {
+      const data = await api.badges.read(
+        this.props.match.params.badgeId
+      )
+
+      this.setState({loading: false, form: data})
+    } catch (error) {
+      this.setState({loading: true, error})
+    }
+  }
+
   handleChange = e => this.setState({
     form: {...this.state.form, 
       [e.target.name]: e.target.value
@@ -27,7 +44,7 @@ class BadgeNew extends React.Component {
     e.preventDefault()
     this.setState({loading: true, error: null})
     try {
-      await api.badges.create(this.state.form);
+      await api.badges.update(this.props.match.params.badgeId, this.state.form);
       this.setState({loading: false, error: null})
 
       this.props.history.push(`/badges/`);
@@ -43,7 +60,7 @@ class BadgeNew extends React.Component {
     }
     return (
       <React.Fragment>
-          <div className="BadgeNew__hero">
+          <div className="BadgeEdit__hero">
             <img className="Badge__hero-image img-fluid" src={header} alt="Logo"/>
           </div>
         <div className="container">
@@ -58,7 +75,7 @@ class BadgeNew extends React.Component {
               />
             </div>
             <div className="col-6">
-              <h1>New Attendant</h1>
+              <h1>Edit Attendant</h1>
               <BadgeForm onChange={this.handleChange} onSubmit={this.handleSubmit} formValues={this.state.form} error={this.state.error}/>
             </div>
           </div>
@@ -69,4 +86,4 @@ class BadgeNew extends React.Component {
 
 }
 
-export default BadgeNew
+export default BadgeEdit
